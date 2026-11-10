@@ -1,0 +1,68 @@
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: school-admission-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: SchoolAdmissionDb
+      POSTGRES_USER: schooladmin
+      POSTGRES_PASSWORD: "SchoolAdmission_Local_2026!"
+    ports:
+      - "5433:5432"
+    volumes:
+      - school_admission_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U schooladmin -d SchoolAdmissionDb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend/SchoolAdmission.Api
+    container_name: school-admission-backend
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_HTTP_PORTS: "8080"
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=SchoolAdmissionDb;Username=schooladmin;Password=SchoolAdmission_Local_2026!"
+      HOLD_DURATION_SECONDS: "600"
+    ports:
+      - "8081:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+
+  backend2:
+    build:
+      context: ./backend/SchoolAdmission.Api
+    container_name: school-admission-backend-2
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_HTTP_PORTS: "8080"
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=SchoolAdmissionDb;Username=schooladmin;Password=SchoolAdmission_Local_2026!"
+      HOLD_DURATION_SECONDS: "600"
+    ports:
+      - "8082:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+
+
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: school-admission-frontend
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+
+volumes:
+  school_admission_postgres_data:
