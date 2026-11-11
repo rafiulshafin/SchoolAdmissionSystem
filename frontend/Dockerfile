@@ -1,3 +1,4 @@
+
 # STAGE 1: Build React application
 FROM node:24-alpine AS build
 
@@ -22,8 +23,11 @@ FROM nginx:alpine AS final
 # Copy React production files
 COPY --from=build /app/dist /usr/share/nginx/html
 
-# Copy Nginx configuration
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Copy Nginx configuration template
+COPY nginx.conf.template /etc/nginx/templates/default.conf.template
+
+# Substitute only BACKEND_URL, preserving Nginx variables
+ENV NGINX_ENVSUBST_FILTER='^BACKEND_URL$'
 
 EXPOSE 80
 
