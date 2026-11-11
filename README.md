@@ -84,7 +84,7 @@ Clone the repository:
 
 ```bash
 
-git clone <YOUR\_PUBLIC\_GITHUB\_REPOSITORY\_URL>
+git clone https://github.com/rafiulshafin/SchoolAdmissionSystem.git
 
 cd SchoolAdmissionSystem
 
